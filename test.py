@@ -65,6 +65,35 @@ class TestHtmlTag(unittest.TestCase):
         self.assertFalse(checker.HtmlTag('<div>').match(checker.HtmlTag('<div>')))
     
 
+class TestChecker(unittest.TestCase):
+
+    def test_valid(self):
+        document = '<a href="#">test</a>'
+        self.assertTrue(checker.valid(document).status)
+
+    def test_valid2(self):
+        document = '<div><a href="#">test</a><p>aaa</p></div>'
+        self.assertTrue(checker.valid(document).status)
+
+    def test_valid_not_found_close_tag(self):
+        document = '<a href="#">test'
+        result = checker.valid(document)
+        self.assertFalse(result.status)
+        self.assertTrue(result.reason, "NOT_FOUND_CLOSE_TAG")
+
+    def test_valid_unmatch_tag(self):
+        document = '<div>hoge</p></div>'
+        result = checker.valid(document)
+        self.assertFalse(result.status)
+        self.assertTrue(result.reason, "FOUND_UN_MATCH_TAG")
+
+    def test_valid_not_found_open_tag(self):
+        document = '</div>hoge</div>'
+        result = checker.valid(document)
+        self.assertFalse(result.status)
+        self.assertTrue(result.reason, "NOT_FOUND_OPEN_TAG")
+
+
 if __name__ == '__main__':
     unittest.main()
 

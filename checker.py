@@ -1,9 +1,4 @@
 #!/usr/bin/env python
-# vim: set fileencoding=utf-8 :
-#
-# Created:  2015-02-14
-#
-
 import re
 
 class HtmlTagIterator:
@@ -42,4 +37,54 @@ class HtmlTag:
 
     def match(self, other):
         return self.kind == other.kind and (self.open_tag != other.open_tag)
+
+
+class Result:
+    def __init__(self, status, reason):
+        self._status = status
+        self._reason = reason
+
+    @property
+    def status(self):
+        return self._status
+
+    @property
+    def reason(self):
+        return self._reason
+
+    @staticmethod
+    def ok():
+        return Result(True, "")
+
+    @staticmethod
+    def not_found_close_tag():
+        return Result(False, "NOT_FOUND_CLOSE_TAG")
+
+    @staticmethod
+    def not_found_open_tag():
+        return Result(False, "NOT_FOUND_OPEN_TAG")
+
+    @staticmethod
+    def unmatch_tag():
+        return Result(False, "FOUND_UN_MATCH_TAG")
+
+
+def valid(document):
+    stack = []
+    ite = HtmlTagIterator(document)
+    for tag in ite:
+        if tag.open_tag:
+            stack.append(tag)
+        else:
+            if not stack:
+                return Result.not_found_open_tag()
+
+            latest = stack.pop()
+            if not tag.match(latest):
+                return Result.unmatch_tag()
+
+    if not stack:
+       return Result.ok()
+    else: 
+       return Result.not_found_close_tag()
 
