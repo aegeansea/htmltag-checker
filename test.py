@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# vim: set fileencoding=utf-8 :
-#
+# vim: set fileencoding=utf-8 : #
 # Created:  2015-02-14
 #
 
@@ -93,6 +92,15 @@ class TestChecker(unittest.TestCase):
         self.assertFalse(result.status)
         self.assertTrue(result.reason, "NOT_FOUND_OPEN_TAG")
 
+    def test_br_tag(self):
+        document = '<br><br><br />'
+        result = checker.valid(document)
+        self.assertTrue(result.status)
+
+    def test_img_tag(self):
+        document = "<p><a href='help.html'><img src='images/icon_help.png' alt=''>ヘルプ</a></p>"
+        result = checker.valid(document)
+        self.assertTrue(result.status)
 
 if __name__ == '__main__':
     unittest.main()

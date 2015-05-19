@@ -19,6 +19,10 @@ class HtmlTag:
         self._value = value
 
     @property
+    def single_tag(self):
+        return self.kind in ['br', 'img']
+
+    @property
     def value(self):
         return self._value
 
@@ -73,7 +77,9 @@ def valid(document):
     stack = []
     ite = HtmlTagIterator(document)
     for tag in ite:
-        if tag.open_tag:
+        if tag.single_tag:
+            pass
+        elif tag.open_tag:
             stack.append(tag)
         else:
             if not stack:
