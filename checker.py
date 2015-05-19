@@ -21,7 +21,7 @@ class HtmlTag:
 
     @property
     def single_tag(self):
-        return self.kind in ['br', 'img', 'b']
+        return self.kind in ['br', 'img', 'b', 'hr']
 
     @property
     def value(self):
@@ -71,12 +71,12 @@ class Result:
         return Result(True, "", "")
 
     @staticmethod
-    def not_found_close_tag():
-        return Result(False, "NOT_FOUND_CLOSE_TAG", "")
+    def not_found_close_tag(tag):
+        return Result(False, "NOT_FOUND_CLOSE_TAG", "tag:" + tag.value)
 
     @staticmethod
-    def not_found_open_tag():
-        return Result(False, "NOT_FOUND_OPEN_TAG", "")
+    def not_found_open_tag(tag):
+        return Result(False, "NOT_FOUND_OPEN_TAG", "tag:" + tag.value)
 
     @staticmethod
     def unmatch_tag(open, close):
@@ -93,7 +93,7 @@ def valid(document):
             stack.append(tag)
         else:
             if not stack:
-                return Result.not_found_open_tag()
+                return Result.not_found_open_tag(tag)
 
             latest = stack.pop()
             if not tag.match(latest):
@@ -102,11 +102,15 @@ def valid(document):
     if not stack:
        return Result.ok()
     else: 
-       return Result.not_found_close_tag()
+       return Result.not_found_close_tag(tag)
 
 if __name__ == "__main__":
     document = sys.argv[1]
     result = valid(document)
-    print result.status
-    print result.reason
-    print result.detail
+
+    if not result.status:
+        print sys.argv[2]
+        print result.reason
+        print result.detail
+    else:
+        pass
