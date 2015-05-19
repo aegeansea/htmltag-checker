@@ -21,7 +21,7 @@ class HtmlTag:
 
     @property
     def single_tag(self):
-        return self.kind in ['br', 'img']
+        return self.kind in ['br', 'img', 'b']
 
     @property
     def value(self):
@@ -30,7 +30,7 @@ class HtmlTag:
     @property
     def kind(self):
         m = HtmlTag.TAG_KIND_PATTERN.match(self.value)
-        return m.group(1)
+        return m.group(1).lower()
 
     @property
     def open_tag(self):
@@ -45,9 +45,10 @@ class HtmlTag:
 
 
 class Result:
-    def __init__(self, status, reason):
+    def __init__(self, status, reason, detail):
         self._status = status
         self._reason = reason
+        self._detail = detail
 
     @property
     def status(self):
@@ -57,21 +58,25 @@ class Result:
     def reason(self):
         return self._reason
 
+    @property
+    def detail(self):
+        return self._detail
+
     @staticmethod
     def ok():
-        return Result(True, "")
+        return Result(True, "", "")
 
     @staticmethod
     def not_found_close_tag():
-        return Result(False, "NOT_FOUND_CLOSE_TAG")
+        return Result(False, "NOT_FOUND_CLOSE_TAG", "")
 
     @staticmethod
     def not_found_open_tag():
-        return Result(False, "NOT_FOUND_OPEN_TAG")
+        return Result(False, "NOT_FOUND_OPEN_TAG", "")
 
     @staticmethod
-    def unmatch_tag():
-        return Result(False, "FOUND_UN_MATCH_TAG")
+    def unmatch_tag(open, close):
+        return Result(False, "FOUND_UN_MATCH_TAG", "open:" + open.value + " close:" + close.value)
 
 
 def valid(document):
@@ -88,7 +93,7 @@ def valid(document):
 
             latest = stack.pop()
             if not tag.match(latest):
-                return Result.unmatch_tag()
+                return Result.unmatch_tag(latest, tag)
 
     if not stack:
        return Result.ok()
@@ -100,3 +105,4 @@ if __name__ == "__main__":
     result = valid(document)
     print result.status
     print result.reason
+    print result.detail
