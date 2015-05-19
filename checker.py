@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import re
+import sys
 
 class HtmlTagIterator:
     def __init__(self, document):
@@ -94,3 +95,8 @@ def valid(document):
     else: 
        return Result.not_found_close_tag()
 
+if __name__ == "__main__":
+    document = sys.argv[1]
+    result = valid(document)
+    print result.status
+    print result.reason
