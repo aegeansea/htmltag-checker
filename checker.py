@@ -40,6 +40,10 @@ class HtmlTag:
     def close_tag(self):
         return HtmlTag.END_TAG_PATTERN.match(self.value)
 
+    @property
+    def is_comment(self):
+        return self.value.startswith('<--') or self.value.endswith('-->')
+
     def match(self, other):
         return self.kind == other.kind and (self.open_tag != other.open_tag)
 
@@ -83,7 +87,7 @@ def valid(document):
     stack = []
     ite = HtmlTagIterator(document)
     for tag in ite:
-        if tag.single_tag:
+        if tag.is_comment or tag.single_tag:
             pass
         elif tag.open_tag:
             stack.append(tag)
